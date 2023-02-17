@@ -1,11 +1,18 @@
+
 use bevy::prelude::*;
+
 use bird::BirdPlugin;
 use physics::PhysicsPlugin;
-
+use pipes::PipesPulgin;
 
 mod components;
 mod physics;
 mod bird;
+mod pipes;
+
+
+const WINDOW_WIDTH: f32 = 300.0;
+const WINDOW_HEIGHT: f32 = 400.0;
 
 
 fn main() {
@@ -14,8 +21,8 @@ fn main() {
     .add_plugins(DefaultPlugins.set(WindowPlugin {
         window: WindowDescriptor {
             title: "Flappy bird!".to_string(),
-            width: 598.0,
-            height: 676.0,
+            width: WINDOW_WIDTH,
+            height: WINDOW_HEIGHT,
             ..Default::default()
         },
         ..Default::default()
@@ -23,6 +30,7 @@ fn main() {
     .add_startup_system(setup_system)
     .add_plugin(BirdPlugin)
     .add_plugin(PhysicsPlugin)
+    .add_plugin(PipesPulgin)
     .run();
 
 }

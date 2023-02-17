@@ -4,9 +4,9 @@ use crate::components::{Bird, AffectedByGravity, Velocity, Movable, PlayerContro
 
 
 const PLAYER_SPRITE: &str = "parrot.png";
-const PLAYER_SCALE: f32 = 0.5;
+const PLAYER_SCALE: f32 = 0.25;
 
-const PLAYER_IMPULSE: f32 = 100.;
+const PLAYER_IMPULSE: f32 = 50.;
 
 pub struct BirdPlugin;
 impl Plugin for BirdPlugin {
@@ -25,9 +25,9 @@ fn bird_spawn_system(
         .spawn(SpriteBundle { 
             texture: asset_server.load(PLAYER_SPRITE), 
             transform: Transform { 
-                translation: Vec3::new(0.,100.,100.),
-                scale: Vec3::new(PLAYER_SCALE, PLAYER_SCALE , PLAYER_SCALE),
-                ..Default::default() 
+                translation: Vec3::new(0.,0., 0.),
+                rotation:Quat::IDENTITY, 
+                scale: Vec3::new(PLAYER_SCALE, PLAYER_SCALE , 1.),
             },
             ..Default::default() 
         })
