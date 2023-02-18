@@ -7,10 +7,11 @@ use pipes::PipesPulgin;
 use background::BackgroundPlugin;
 
 mod components;
+mod background;
 mod physics;
 mod bird;
 mod pipes;
-mod background;
+
 
 
 const WINDOW_WIDTH: f32 = 300.0;

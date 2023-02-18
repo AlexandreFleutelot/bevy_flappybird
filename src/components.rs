@@ -7,7 +7,7 @@ pub struct Bird;
 pub struct Pipe;
 
 #[derive(Component)]
-pub struct Background;
+pub struct Ground;
 
 #[derive(Component)]
 pub struct PlayerControl;

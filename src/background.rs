@@ -1,13 +1,11 @@
-use std::thread::spawn;
-
 use bevy::prelude::*;
 
 use crate::{WINDOW_WIDTH, WINDOW_HEIGHT};
-use crate::components::{Movable, Velocity, Background};
+use crate::components::{Movable, Velocity, Ground};
 
 const GROUND_SPRITE: &str = "sprites/base.png";
 const GROUND_SCALE: f32 = 1.0;
-const GROUND_SPRITE_SIZE: (f32, f32) = (336., 112.);
+pub const GROUND_SPRITE_SIZE: (f32, f32) = (336., 112.);
 
 const GROUND_SLIDE_SPEED: f32 = -100.;
 
@@ -29,13 +27,13 @@ fn ground_setup(
         commands.spawn(SpriteBundle { 
             texture: asset_server.load(GROUND_SPRITE), 
             transform: Transform { 
-                translation: Vec3::new(offset,-WINDOW_HEIGHT/2. + GROUND_SPRITE_SIZE.1 /3. ,0.), 
+                translation: Vec3::new(offset,-WINDOW_HEIGHT/2. + GROUND_SPRITE_SIZE.1 /3. ,1.), 
                 rotation: Quat::IDENTITY, 
                 scale: Vec3::new(GROUND_SCALE, GROUND_SCALE, 1.) 
             },         
             ..Default::default()
         })
-        .insert(Background)
+        .insert(Ground)
         .insert(Movable)
         .insert(Velocity {x:GROUND_SLIDE_SPEED, y:0.});
     };
@@ -44,12 +42,10 @@ fn ground_setup(
 }   
 
 fn ground_slide_system(
-    mut query: Query<&mut Transform, With<Background>>)
+    mut query: Query<&mut Transform, With<Ground>>)
 {
     for mut tf in query.iter_mut() {
-        println!("test1");
         if tf.translation.x < -WINDOW_WIDTH {
-            println!("test2");
             tf.translation.x = WINDOW_WIDTH;
         }
     }

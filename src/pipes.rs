@@ -2,9 +2,10 @@
 use bevy::prelude::*;
 use bevy::time::FixedTimestep;
 use std::f32::consts::PI;
+use rand::Rng;
 
 use crate::components::{Pipe, Movable, Velocity};
-use crate::{WINDOW_WIDTH, WINDOW_HEIGHT};
+use crate::{WINDOW_WIDTH};
 
 const PIPE_SPRITE: &str = "sprites/pipe-green.png";
 const PIPE_SCALE: f32 = 1.0;
@@ -46,15 +47,18 @@ fn pipe_spawn_system(
             .insert(Velocity {x:PIPE_SPEED, y:0.});
     };
 
-    let pipe_offset = PIPE_SPRITE_SIZE.1 * PIPE_SCALE / 2. + PIPE_OPENING_SIZE ;
-    spawn_tube(pipe_offset, PI);
-    spawn_tube(-pipe_offset, 0.);
+    let mut rng = rand::thread_rng();
+    let rnd =  rng.gen_range(-10.0..60.0);
+    let pipe_offset = PIPE_SPRITE_SIZE.1 * PIPE_SCALE / 2. + PIPE_OPENING_SIZE;
+    spawn_tube(pipe_offset + rnd, PI);
+    spawn_tube(-pipe_offset + rnd, 0.);
 }
 
 fn pipe_despawn_system(
     mut commands: Commands,
     mut pipe_query: Query<(Entity, &mut Transform), With<Pipe>> )
 {
+    //todo!("verif mut required?");
     for (pipe, transform) in pipe_query.iter_mut()
     {
         let tf = transform.translation;
