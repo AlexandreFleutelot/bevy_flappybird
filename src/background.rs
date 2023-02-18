@@ -1,14 +1,7 @@
 use bevy::prelude::*;
 
-use crate::{WINDOW_WIDTH, WINDOW_HEIGHT};
+use crate::{WINDOW_WIDTH, WINDOW_HEIGHT, GROUND_SPRITE, GROUND_SPRITE_SIZE, GROUND_SCALE, GROUND_SLIDE_SPEED};
 use crate::components::{Movable, Velocity, Ground};
-
-const GROUND_SPRITE: &str = "sprites/base.png";
-const GROUND_SCALE: f32 = 1.0;
-pub const GROUND_SPRITE_SIZE: (f32, f32) = (336., 112.);
-
-const GROUND_SLIDE_SPEED: f32 = -100.;
-
 
 pub struct BackgroundPlugin;
 impl Plugin for BackgroundPlugin {

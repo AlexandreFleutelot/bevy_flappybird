@@ -5,14 +5,7 @@ use std::f32::consts::PI;
 use rand::Rng;
 
 use crate::components::{Pipe, Movable, Velocity};
-use crate::{WINDOW_WIDTH};
-
-const PIPE_SPRITE: &str = "sprites/pipe-green.png";
-const PIPE_SCALE: f32 = 1.0;
-const PIPE_SPRITE_SIZE : (f32, f32) = (52., 320.);
-
-const PIPE_OPENING_SIZE: f32 = 40.;
-const PIPE_SPEED: f32 = -100.;
+use crate::{WINDOW_WIDTH, PIPE_SPRITE, PIPE_SCALE, PIPE_SPEED, PIPE_OPENING_SIZE, PIPE_SPRITE_SIZE};
 
 pub struct PipesPulgin ;
 impl Plugin for PipesPulgin {
