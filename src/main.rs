@@ -4,11 +4,13 @@ use bevy::prelude::*;
 use bird::BirdPlugin;
 use physics::PhysicsPlugin;
 use pipes::PipesPulgin;
+use background::BackgroundPlugin;
 
 mod components;
 mod physics;
 mod bird;
 mod pipes;
+mod background;
 
 
 const WINDOW_WIDTH: f32 = 300.0;
@@ -31,6 +33,7 @@ fn main() {
     .add_plugin(BirdPlugin)
     .add_plugin(PhysicsPlugin)
     .add_plugin(PipesPulgin)
+    .add_plugin(BackgroundPlugin)
     .run();
 
 }

@@ -3,8 +3,9 @@ use bevy::prelude::*;
 use crate::components::{Bird, AffectedByGravity, Velocity, Movable, PlayerControl};
 
 
-const PLAYER_SPRITE: &str = "parrot.png";
-const PLAYER_SCALE: f32 = 0.25;
+const PLAYER_SPRITE: &str = "sprites/redbird-midflap.png";
+const PLAYER_SPRITE_SIZE: (f32, f32) = (34. ,24.);
+const PLAYER_SCALE: f32 = 1.0;
 
 const PLAYER_IMPULSE: f32 = 50.;
 
