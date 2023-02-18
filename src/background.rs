@@ -3,19 +3,21 @@ use std::thread::spawn;
 use bevy::prelude::*;
 
 use crate::{WINDOW_WIDTH, WINDOW_HEIGHT};
+use crate::components::{Movable, Velocity, Background};
 
 const GROUND_SPRITE: &str = "sprites/base.png";
 const GROUND_SCALE: f32 = 1.0;
 const GROUND_SPRITE_SIZE: (f32, f32) = (336., 112.);
 
-const GROUND_SLIDE_SPEED: f32 = 100.;
+const GROUND_SLIDE_SPEED: f32 = -100.;
 
 
 pub struct BackgroundPlugin;
 impl Plugin for BackgroundPlugin {
     fn build(&self, app: &mut App) {
         app
-        .add_startup_system(ground_setup);
+        .add_startup_system(ground_setup)
+        .add_system(ground_slide_system);
     }
 }
 
@@ -32,13 +34,25 @@ fn ground_setup(
                 scale: Vec3::new(GROUND_SCALE, GROUND_SCALE, 1.) 
             },         
             ..Default::default()
-        });
+        })
+        .insert(Background)
+        .insert(Movable)
+        .insert(Velocity {x:GROUND_SLIDE_SPEED, y:0.});
     };
     spawn_background(0.);
     spawn_background(WINDOW_WIDTH)
 }   
 
-fn ground_slide_system()
+fn ground_slide_system(
+    mut query: Query<&mut Transform, With<Background>>)
 {
-    todo!();
+    for mut tf in query.iter_mut() {
+        println!("test1");
+        if tf.translation.x < -WINDOW_WIDTH {
+            println!("test2");
+            tf.translation.x = WINDOW_WIDTH;
+        }
+    }
 }
+
+
