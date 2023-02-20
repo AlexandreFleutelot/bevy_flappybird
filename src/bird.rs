@@ -2,22 +2,28 @@ use bevy::prelude::*;
 
 use bevy::sprite::collide_aabb::collide;
 use crate::components::{Bird, AffectedByGravity, Velocity, Movable, PlayerControl, ScoreBox, Ground, Pipe};
-use crate::{WINDOW_HEIGHT, BIRD_SPRITE_SIZE, GROUND_SPRITE_SIZE,  PIPE_SPRITE_SIZE, PIPE_SCALE};
+use crate::{WINDOW_HEIGHT, BIRD_SPRITE_SIZE, GROUND_SPRITE_SIZE,  PIPE_SPRITE_SIZE, PIPE_SCALE, GameState};
 use crate::{BIRD_SPRITE, BIRD_SCALE, PLAYER_IMPULSE, ScoreEvent, GameOverEvent};
 
 pub struct BirdPlugin;
 impl Plugin for BirdPlugin {
     fn build(&self, app: &mut App) {
         app
-        .add_startup_system(bird_spawn_system)
-        .add_system(player_impulse_system)
-        .add_system(bird_scoring_system)
-        .add_system(bird_bounds_collision)
-        .add_system(bird_pipe_collision);
+        .add_system_set(
+            SystemSet::on_exit(GameState::Menu)
+            .with_system(spawn_bird_system)
+        )
+        .add_system_set(
+            SystemSet::on_update(GameState::Playing)
+            .with_system(player_impulse_system)
+            .with_system(bird_scoring_system)
+            .with_system(bird_bounds_collision)
+            .with_system(bird_pipe_collision)
+        );
     }
 }
 
-fn bird_spawn_system(
+fn spawn_bird_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>) 
 {

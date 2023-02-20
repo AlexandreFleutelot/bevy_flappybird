@@ -13,6 +13,12 @@ pub struct ScoreBox;
 pub struct ScoreText;
 
 #[derive(Component)]
+pub struct Menu;
+
+#[derive(Component)]
+pub struct GameOver;
+
+#[derive(Component)]
 pub struct Ground;
 
 #[derive(Component)]

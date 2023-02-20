@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 
 use crate::components::{Velocity, Movable, AffectedByGravity};
-use crate::{MOVES_SPEED};
+use crate::{MOVES_SPEED, GameState};
 
 #[derive(Resource)]
 pub struct Gravity {
@@ -15,8 +15,11 @@ impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
         app
         .insert_resource(Gravity {x:0., y:-9.81})
-        .add_system(move_system)
-        .add_system(apply_gravity);
+        .add_system_set(
+            SystemSet::on_update(GameState::Playing)
+            .with_system(move_system)
+            .with_system(apply_gravity)
+        );
     }
 }
 

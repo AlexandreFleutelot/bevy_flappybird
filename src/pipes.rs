@@ -5,7 +5,7 @@ use std::f32::consts::PI;
 use rand::Rng;
 
 use crate::components::{Pipe, Movable, Velocity, ScoreBox};
-use crate::{WINDOW_WIDTH, PIPE_SPRITE, PIPE_SCALE, PIPE_SPEED, PIPE_OPENING_SIZE, PIPE_SPRITE_SIZE};
+use crate::{WINDOW_WIDTH, PIPE_SPRITE, PIPE_SCALE, PIPE_SPEED, PIPE_OPENING_SIZE, PIPE_SPRITE_SIZE, GameState};
 
 pub struct PipesPulgin ;
 impl Plugin for PipesPulgin {
@@ -22,7 +22,8 @@ impl Plugin for PipesPulgin {
 
 fn pipe_spawn_system(
     mut commands: Commands,
-    asset_server: Res<AssetServer>) 
+    asset_server: Res<AssetServer>,
+    game_state: Res<State<GameState>>) 
 {
     let mut spawn_tube = |offset:f32, rot: f32| {
         commands
@@ -44,17 +45,19 @@ fn pipe_spawn_system(
     let rnd =  rng.gen_range(-10.0..60.0);
     let pipe_offset = PIPE_SPRITE_SIZE.1 * PIPE_SCALE / 2. + PIPE_OPENING_SIZE;
 
-    spawn_tube(pipe_offset + rnd, PI);
-    spawn_tube(-pipe_offset + rnd, 0.);
+    if game_state.current() == &GameState::Playing {
+        spawn_tube(pipe_offset + rnd, PI);
+        spawn_tube(-pipe_offset + rnd, 0.);
 
-    //scoring box
-    commands
-        .spawn(Transform{ 
-            translation: Vec3::new(WINDOW_WIDTH/2.,0.,0.),
-            ..Default::default()})
-        .insert(ScoreBox)
-        .insert(Movable)
-        .insert(Velocity {x:PIPE_SPEED, y:0.});
+        //scoring box
+        commands
+            .spawn(Transform{ 
+                translation: Vec3::new(WINDOW_WIDTH/2.,0.,0.),
+                ..Default::default()})
+            .insert(ScoreBox)
+            .insert(Movable)
+            .insert(Velocity {x:PIPE_SPEED, y:0.});
+    }
 }
 
 fn pipe_despawn_system(
