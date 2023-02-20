@@ -3,7 +3,7 @@
 version = 3
 
 [[package]]
-name = "RUST-FlappyBird"
+name = "RUST-flappybird"
 version = "0.1.0"
 dependencies = [
  "bevy",

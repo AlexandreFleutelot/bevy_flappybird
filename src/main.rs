@@ -1,7 +1,7 @@
-
 use bevy::prelude::*;
 
 use bird::BirdPlugin;
+use components::ScoreText;
 use physics::PhysicsPlugin;
 use pipes::PipesPulgin;
 use background::BackgroundPlugin;
@@ -34,11 +34,20 @@ mod pipes;
 mod physics;
 
 pub struct ScoreEvent(pub u32);
-pub struct GameOverEvent;
+pub struct GameOverEvent(Entity);
+
+#[derive(Resource)]
+struct Scoreboard {
+    score: u32,
+}
 
 fn main() {
     App::new()
     .insert_resource(ClearColor(Color::rgb(0.04, 0.04, 0.5)))
+    .insert_resource(Scoreboard { score: 0 })
+    .add_event::<ScoreEvent>()
+    .add_event::<GameOverEvent>()
+    .add_startup_system(setup_system)
     .add_plugins(DefaultPlugins.set(WindowPlugin {
         window: WindowDescriptor {
             title: "Flappy bird!".to_string(),
@@ -48,10 +57,7 @@ fn main() {
             ..Default::default()
         },
         ..Default::default()
-    }))
-    .add_event::<ScoreEvent>()
-    .add_event::<GameOverEvent>()
-    .add_startup_system(setup_system)
+    }))    
     .add_plugin(BirdPlugin)
     .add_plugin(PhysicsPlugin)
     .add_plugin(PipesPulgin)
@@ -59,30 +65,49 @@ fn main() {
     .add_system(score_system)
     .add_system(gameover_system)
     .run();
-
 }
 
 fn setup_system(
-    mut commands: Commands)
+    mut commands: Commands,
+    asset_server: Res<AssetServer>)
 {
     // camera
     commands.spawn(Camera2dBundle::default());
 
-}
+    let text_style = TextStyle {
+        font: asset_server.load("fonts/flappybird.ttf"),
+        font_size: 60.0,
+        color: Color::WHITE,
+    };
 
+    commands.spawn(Text2dBundle {
+        text: Text::from_section("4", text_style)
+        .with_alignment( TextAlignment::TOP_CENTER),
+        transform: Transform::from_xyz(0., WINDOW_HEIGHT/2.-10., 1.),
+        ..Default::default()
+    })
+    .insert(ScoreText);
+
+}
 
 fn score_system(
     mut ev_scored: EventReader<ScoreEvent>,
+    mut score_board: ResMut<Scoreboard>,
+    mut score_query: Query<&mut Text, With<ScoreText>>
 ) {
     for ev in ev_scored.iter() {
-        println!("Scored {:?}", ev.0);
+        score_board.score += ev.0;
+    }
+
+    for mut text in &mut score_query {
+        text.sections[0].value = score_board.score.to_string();
     }
 }
 
 fn gameover_system(
     mut ev_gameover: EventReader<GameOverEvent>,
 ) {
-    for _ in ev_gameover.iter() {
-        println!("GameOver");
+    for ev in ev_gameover.iter() {
+        println!("GameOver {:?}", ev.0);
     }
 }

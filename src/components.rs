@@ -10,6 +10,9 @@ pub struct Pipe;
 pub struct ScoreBox;
 
 #[derive(Component)]
+pub struct ScoreText;
+
+#[derive(Component)]
 pub struct Ground;
 
 #[derive(Component)]

@@ -66,18 +66,18 @@ fn bird_scoring_system(
 }
 
 fn bird_bounds_collision(
-    mut bird_query: Query<(&mut Transform, &mut Velocity, With<Bird>), Without<Ground>>,
+    mut bird_query: Query<(&mut Transform, &mut Velocity, Entity, With<Bird>), Without<Ground>>,
     ground_query: Query<(&Transform, With<Ground>), Without<Bird>>,
     mut ev_gameover: EventWriter<GameOverEvent>)
 {
-    if let Ok((mut bird_tf, mut velo, _)) = bird_query.get_single_mut() {
+    if let Ok((mut bird_tf, mut velo, piaf, _)) = bird_query.get_single_mut() {
         let bird_bottom = bird_tf.translation.y - BIRD_SPRITE_SIZE.1 / 2.;
         for (ground_tf, _) in ground_query.iter() {
             let ground_level = ground_tf.translation.y + GROUND_SPRITE_SIZE.1 / 2.;
             if bird_bottom < ground_level {
                 bird_tf.translation.y = ground_level + BIRD_SPRITE_SIZE.1/2.;
                 velo.y = -velo.y / 2.; //slow bouncing on top of screen
-                ev_gameover.send(GameOverEvent);
+                ev_gameover.send(GameOverEvent(piaf));
             }
         }
 
@@ -89,11 +89,11 @@ fn bird_bounds_collision(
 }
 
 fn bird_pipe_collision(
-    bird_query: Query<&Transform, With<Bird>>,
+    bird_query: Query<(&Transform, Entity), With<Bird>>,
     pipe_query: Query<&Transform, With<Pipe>>,
     mut ev_gameover: EventWriter<GameOverEvent>)
 {
-    if let Ok(bird_tf) = bird_query.get_single() {
+    if let Ok((bird_tf, piaf)) = bird_query.get_single() {
         for pipe_tf in pipe_query.iter(){
             let collision =  collide(
                 bird_tf.translation,
@@ -102,7 +102,7 @@ fn bird_pipe_collision(
                 Vec2::new(PIPE_SPRITE_SIZE.0 * PIPE_SCALE, PIPE_SPRITE_SIZE.1 * PIPE_SCALE)); 
             
             if let Some(_) = collision {
-                ev_gameover.send(GameOverEvent);
+                ev_gameover.send(GameOverEvent(piaf));
             }  
         }
     }
