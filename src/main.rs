@@ -33,6 +33,8 @@ mod bird;
 mod pipes;
 mod physics;
 
+pub struct ScoreEvent(pub u32);
+pub struct GameOverEvent;
 
 fn main() {
     App::new()
@@ -42,15 +44,20 @@ fn main() {
             title: "Flappy bird!".to_string(),
             width: WINDOW_WIDTH,
             height: WINDOW_HEIGHT,
+            resizable: false,
             ..Default::default()
         },
         ..Default::default()
     }))
+    .add_event::<ScoreEvent>()
+    .add_event::<GameOverEvent>()
     .add_startup_system(setup_system)
     .add_plugin(BirdPlugin)
     .add_plugin(PhysicsPlugin)
     .add_plugin(PipesPulgin)
     .add_plugin(BackgroundPlugin)
+    .add_system(score_system)
+    .add_system(gameover_system)
     .run();
 
 }
@@ -61,4 +68,21 @@ fn setup_system(
     // camera
     commands.spawn(Camera2dBundle::default());
 
+}
+
+
+fn score_system(
+    mut ev_scored: EventReader<ScoreEvent>,
+) {
+    for ev in ev_scored.iter() {
+        println!("Scored {:?}", ev.0);
+    }
+}
+
+fn gameover_system(
+    mut ev_gameover: EventReader<GameOverEvent>,
+) {
+    for _ in ev_gameover.iter() {
+        println!("GameOver");
+    }
 }

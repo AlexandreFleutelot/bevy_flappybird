@@ -4,7 +4,7 @@ use bevy::time::FixedTimestep;
 use std::f32::consts::PI;
 use rand::Rng;
 
-use crate::components::{Pipe, Movable, Velocity};
+use crate::components::{Pipe, Movable, Velocity, ScoreBox};
 use crate::{WINDOW_WIDTH, PIPE_SPRITE, PIPE_SCALE, PIPE_SPEED, PIPE_OPENING_SIZE, PIPE_SPRITE_SIZE};
 
 pub struct PipesPulgin ;
@@ -43,16 +43,25 @@ fn pipe_spawn_system(
     let mut rng = rand::thread_rng();
     let rnd =  rng.gen_range(-10.0..60.0);
     let pipe_offset = PIPE_SPRITE_SIZE.1 * PIPE_SCALE / 2. + PIPE_OPENING_SIZE;
+
     spawn_tube(pipe_offset + rnd, PI);
     spawn_tube(-pipe_offset + rnd, 0.);
+
+    //scoring box
+    commands
+        .spawn(Transform{ 
+            translation: Vec3::new(WINDOW_WIDTH/2.,0.,0.),
+            ..Default::default()})
+        .insert(ScoreBox)
+        .insert(Movable)
+        .insert(Velocity {x:PIPE_SPEED, y:0.});
 }
 
 fn pipe_despawn_system(
     mut commands: Commands,
-    mut pipe_query: Query<(Entity, &mut Transform), With<Pipe>> )
+    pipe_query: Query<(Entity, &Transform), With<Pipe>>)
 {
-    //todo!("verif mut required?");
-    for (pipe, transform) in pipe_query.iter_mut()
+    for (pipe, transform) in pipe_query.iter()
     {
         let tf = transform.translation;
         if tf.x < -WINDOW_WIDTH/2. - 50. {
