@@ -13,9 +13,9 @@ const GROUND_SPRITE: &str = "sprites/base.png";
 const GROUND_SCALE: f32 = 1.0;
 const GROUND_SPRITE_SIZE: (f32, f32) = (336., 112.);
 
-const BIRD_SPRITE: &str = "sprites/redbird-midflap.png";
-const BIRD_SPRITE_SIZE: (f32, f32) = (34. ,24.);
-const BIRD_SCALE: f32 = 1.0;
+const BIRD_SPRITE: &str = "sprites/bird.png";
+const BIRD_ANIMATION_SPEED: f32 = 10.0;
+const BIRD_SIZE: Vec2 = Vec2::new(34.0, 24.0);
 const PLAYER_IMPULSE: f32 = 50.;
 
 const PIPE_SPRITE: &str = "sprites/pipe-green.png";
@@ -100,12 +100,4 @@ fn setup_system(
         point: asset_server.load("audio/point.ogg"),
     });
 
-}
-
-pub fn hit_sound(audio_handles: Res<AudioHandles>, audio: Res<Audio>) {
-    audio.play(audio_handles.hit.clone());
-}
-
-pub fn point_sound(audio_handles: Res<AudioHandles>, audio: Res<Audio>) {
-    audio.play(audio_handles.point.clone());
 }

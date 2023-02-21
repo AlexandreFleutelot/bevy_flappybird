@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use bevy::sprite::collide_aabb::collide;
 use crate::components::{Bird, AffectedByGravity, Velocity, Movable, PlayerControl, ScoreBox, Ground, Pipe};
-use crate::{WINDOW_HEIGHT, BIRD_SPRITE_SIZE, GROUND_SPRITE_SIZE,  PIPE_SPRITE_SIZE, PIPE_SCALE, BIRD_SPRITE, BIRD_SCALE, PLAYER_IMPULSE};
+use crate::{WINDOW_HEIGHT, BIRD_SIZE, GROUND_SPRITE_SIZE,  PIPE_SPRITE_SIZE, PIPE_SCALE, PLAYER_IMPULSE, BIRD_ANIMATION_SPEED, BIRD_SPRITE, PIPE_SPEED};
 use crate::{ScoreEvent, GameOverEvent, GameState, AudioHandles};
 
 pub struct BirdPlugin;
@@ -19,29 +19,40 @@ impl Plugin for BirdPlugin {
             .with_system(bird_scoring_system)
             .with_system(bird_bounds_collision)
             .with_system(bird_pipe_collision)
-        );
+        )
+        .add_system(animate_bird)
+        .add_system(rotate_bird);
     }
 }
 
 fn spawn_bird_system(
     mut commands: Commands,
-    asset_server: Res<AssetServer>) 
+    asset_server: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,) 
 {
-    commands
-        .spawn(SpriteBundle { 
-            texture: asset_server.load(BIRD_SPRITE), 
-            transform: Transform { 
-                translation: Vec3::new(0.,0., 0.),
-                rotation:Quat::IDENTITY, 
-                scale: Vec3::new(BIRD_SCALE, BIRD_SCALE , 1.),
+        let bird_texture = asset_server.load(BIRD_SPRITE);
+        let texture_atlas = texture_atlases.add(TextureAtlas::from_grid(
+            bird_texture,
+            BIRD_SIZE,
+            4,
+            1,
+            None,
+            None,
+        ));
+
+        commands.spawn((
+            SpriteSheetBundle {
+                texture_atlas,
+                transform: Transform::from_xyz(0.0, 0.0, 1.),
+                ..Default::default()
             },
-            ..Default::default() 
-        })
+        ))
         .insert(Bird)
         .insert(PlayerControl)
         .insert(Movable)
         .insert(AffectedByGravity)
         .insert(Velocity {x:0., y:0.});
+
 }
 
 
@@ -78,19 +89,19 @@ fn bird_bounds_collision(
     mut ev_gameover: EventWriter<GameOverEvent>)
 {
     if let Ok((mut bird_tf, mut velo, piaf, _)) = bird_query.get_single_mut() {
-        let bird_bottom = bird_tf.translation.y - BIRD_SPRITE_SIZE.1 / 2.;
+        let bird_bottom = bird_tf.translation.y - BIRD_SIZE[1] / 2.;
         for (ground_tf, _) in ground_query.iter() {
             let ground_level = ground_tf.translation.y + GROUND_SPRITE_SIZE.1 / 2.;
             if bird_bottom < ground_level {
-                bird_tf.translation.y = ground_level + BIRD_SPRITE_SIZE.1/2.;
+                bird_tf.translation.y = ground_level + BIRD_SIZE[1]/2.;
                 velo.y = -velo.y / 2.; //slow bouncing on top of screen
                 ev_gameover.send(GameOverEvent(piaf));
             }
         }
 
-        let bird_top = bird_tf.translation.y + BIRD_SPRITE_SIZE.1 / 2.;
+        let bird_top = bird_tf.translation.y + BIRD_SIZE[1] / 2.;
          if bird_top > WINDOW_HEIGHT / 2. {
-             bird_tf.translation.y = WINDOW_HEIGHT/2. - BIRD_SPRITE_SIZE.1/2.; //dont go under the ground
+             bird_tf.translation.y = WINDOW_HEIGHT/2. - BIRD_SIZE[1]/2.; //dont go under the ground
         }
     }
 }
@@ -104,7 +115,7 @@ fn bird_pipe_collision(
         for pipe_tf in pipe_query.iter(){
             let collision =  collide(
                 bird_tf.translation,
-                Vec2::new(BIRD_SPRITE_SIZE.0 * BIRD_SCALE, BIRD_SPRITE_SIZE.1 * BIRD_SCALE),
+                BIRD_SIZE,
                 pipe_tf.translation,
                 Vec2::new(PIPE_SPRITE_SIZE.0 * PIPE_SCALE, PIPE_SPRITE_SIZE.1 * PIPE_SCALE)); 
             
@@ -112,5 +123,18 @@ fn bird_pipe_collision(
                 ev_gameover.send(GameOverEvent(piaf));
             }  
         }
+    }
+}
+
+fn animate_bird(mut bird: Query<&mut TextureAtlasSprite, With<Bird>>, time: Res<Time>) {
+    for mut bird in &mut bird {
+        bird.index = (time.elapsed_seconds() * BIRD_ANIMATION_SPEED) as usize % 4;
+    }
+}
+
+fn rotate_bird(mut bird_query: Query<(&mut Transform, &Velocity), With<Bird>>){
+    for (mut bird_tf, bird_vel) in bird_query.iter_mut() {
+        let angle = (bird_vel.y.clone() / -PIPE_SPEED).atan();
+        bird_tf.rotation = Quat::from_rotation_z(angle);
     }
 }
