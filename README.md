@@ -1,5 +1,5 @@
 # RUST-FlappyBird
-1st level of the 20 games challenge
+1st level of the 20 games challenge: https://20_games_challenge.gitlab.io/
 
 flappy bird in RUST with Bevy engine 0.9
 
