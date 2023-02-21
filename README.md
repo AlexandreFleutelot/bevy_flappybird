@@ -9,6 +9,7 @@ flappy bird in RUST with Bevy engine 0.9
 - Parallax (customized reusable system for background and ground)
 - simple aabb colision
 - simple input system
+- sprite animation using spritesheet 
 
 main difficulties:
 - Text GUI
