@@ -12,7 +12,6 @@ const WINDOW_HEIGHT: f32 = 400.0;
 const GROUND_SPRITE: &str = "sprites/base.png";
 const GROUND_SCALE: f32 = 1.0;
 const GROUND_SPRITE_SIZE: (f32, f32) = (336., 112.);
-const GROUND_SLIDE_SPEED: f32 = -100.;
 
 const BIRD_SPRITE: &str = "sprites/redbird-midflap.png";
 const BIRD_SPRITE_SIZE: (f32, f32) = (34. ,24.);
@@ -28,7 +27,10 @@ const PIPE_SPEED: f32 = -100.;
 const START_MENU_SPRITE: &str = "sprites/message.png";
 const GAMEOVER_SPRITE: &str = "sprites/gameover.png";
 
+const BACKGROUND_SPRITE: &str = "sprites/background-day.png";
+
 const MOVES_SPEED: f32 = 10.;
+
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 enum GameState {
@@ -40,6 +42,13 @@ enum GameState {
 #[derive(Resource)]
 pub struct GameData {
     pub score: u32,
+}
+
+#[derive(Resource)]
+pub struct AudioHandles {
+    pub wing: Handle<AudioSource>,
+    pub hit: Handle<AudioSource>,
+    pub point: Handle<AudioSource>,
 }
 
 mod gui;
@@ -54,7 +63,6 @@ pub struct GameOverEvent(Entity);
 
 fn main() {
     App::new()
-    .insert_resource(ClearColor(Color::rgb(0.04, 0.04, 0.5)))
     .insert_resource(GameData { score: 0 })
     .add_event::<ScoreEvent>()
     .add_event::<GameOverEvent>()
@@ -79,10 +87,25 @@ fn main() {
 }
 
 fn setup_system(
-    mut commands: Commands)
+    mut commands: Commands,
+    asset_server: Res<AssetServer>)
 {
     // camera
     commands.spawn(Camera2dBundle::default());
 
+    //audio
+    commands.insert_resource(AudioHandles {
+        wing: asset_server.load("audio/flap.ogg"),
+        hit: asset_server.load("audio/hit.ogg"),
+        point: asset_server.load("audio/point.ogg"),
+    });
+
 }
 
+pub fn hit_sound(audio_handles: Res<AudioHandles>, audio: Res<Audio>) {
+    audio.play(audio_handles.hit.clone());
+}
+
+pub fn point_sound(audio_handles: Res<AudioHandles>, audio: Res<Audio>) {
+    audio.play(audio_handles.point.clone());
+}

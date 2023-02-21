@@ -2,8 +2,8 @@ use bevy::prelude::*;
 
 use bevy::sprite::collide_aabb::collide;
 use crate::components::{Bird, AffectedByGravity, Velocity, Movable, PlayerControl, ScoreBox, Ground, Pipe};
-use crate::{WINDOW_HEIGHT, BIRD_SPRITE_SIZE, GROUND_SPRITE_SIZE,  PIPE_SPRITE_SIZE, PIPE_SCALE, GameState};
-use crate::{BIRD_SPRITE, BIRD_SCALE, PLAYER_IMPULSE, ScoreEvent, GameOverEvent};
+use crate::{WINDOW_HEIGHT, BIRD_SPRITE_SIZE, GROUND_SPRITE_SIZE,  PIPE_SPRITE_SIZE, PIPE_SCALE, BIRD_SPRITE, BIRD_SCALE, PLAYER_IMPULSE};
+use crate::{ScoreEvent, GameOverEvent, GameState, AudioHandles};
 
 pub struct BirdPlugin;
 impl Plugin for BirdPlugin {
@@ -47,15 +47,16 @@ fn spawn_bird_system(
 
 fn player_impulse_system(
     kb: Res<Input<KeyCode>>,
-    mut query: Query<&mut Velocity, With<PlayerControl>>
-) 
-{
+    mut query: Query<&mut Velocity, With<PlayerControl>>,
+    audio_handles: Res<AudioHandles>, audio: Res<Audio>
+) {
     if let Ok(mut velo) = query.get_single_mut() {
         if kb.just_pressed(KeyCode::Space) {
             velo.y += PLAYER_IMPULSE;
+            audio.play(audio_handles.wing.clone());
         }
     }
-}
+}    
 
 fn bird_scoring_system(
     mut commands: Commands,

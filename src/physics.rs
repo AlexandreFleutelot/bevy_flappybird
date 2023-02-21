@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 
-
 use crate::components::{Velocity, Movable, AffectedByGravity};
 use crate::{MOVES_SPEED, GameState};
 

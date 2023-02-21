@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
 use crate::components::{ScoreText, Menu, Pipe, ScoreBox, Bird, GameOver};
-use crate::{WINDOW_HEIGHT, GameOverEvent, ScoreEvent, GameData, GameState, START_MENU_SPRITE, GAMEOVER_SPRITE, bird};
+use crate::{WINDOW_HEIGHT,START_MENU_SPRITE, GAMEOVER_SPRITE};
+use crate::{GameOverEvent, ScoreEvent, GameData, GameState, AudioHandles};
 
 pub struct GuiPlugin;
 impl Plugin for GuiPlugin{
@@ -53,10 +54,12 @@ fn score_setup(
 fn score_system(
     mut ev_scored: EventReader<ScoreEvent>,
     mut game_data: ResMut<GameData>,
-    mut scoreboard_query: Query<&mut Text, With<ScoreText>>
+    mut scoreboard_query: Query<&mut Text, With<ScoreText>>,
+    audio_handles: Res<AudioHandles>, audio: Res<Audio>,
 ) {
     for ev in ev_scored.iter() {
         game_data.score += ev.0;
+        audio.play(audio_handles.point.clone());
         if let Ok(mut text) = scoreboard_query.get_single_mut() {
             text.sections[0].value = game_data.score.to_string();
         }
@@ -71,6 +74,7 @@ fn gameover_system(
     pipe_query: Query<Entity, With<Pipe>>,
     scorebox_query: Query<Entity, With<ScoreBox>>,
     bird_query: Query<Entity, With<Bird>>,
+    audio_handles: Res<AudioHandles>, audio: Res<Audio>,
 ) {
     for _ in ev_gameover.iter() {
         game_state.set(GameState::GameOver).unwrap();
@@ -84,6 +88,8 @@ fn gameover_system(
         for ent in bird_query.iter() {
             commands.entity(ent).despawn();
         }
+        
+        audio.play(audio_handles.hit.clone());
     }
 }
 
@@ -108,7 +114,8 @@ fn game_states_system(
 
 fn setup_menu(
     mut commands: Commands,
-    asset_server: Res<AssetServer>
+    asset_server: Res<AssetServer>,
+    mut scoreboard_query: Query<&mut Text, With<ScoreText>>,
 ) {
     commands.spawn(SpriteBundle { 
         texture: asset_server.load(START_MENU_SPRITE), 
@@ -116,6 +123,10 @@ fn setup_menu(
         ..Default::default()
     })
     .insert(Menu);
+
+    if let Ok(mut text) = scoreboard_query.get_single_mut() {
+        text.sections[0].value = "0".to_string();
+    }
 }
 
 fn close_menu(
@@ -133,6 +144,7 @@ fn setup_gameover(
 ) {
     commands.spawn(SpriteBundle { 
         texture: asset_server.load(GAMEOVER_SPRITE), 
+        transform: Transform::from_xyz(0., 0., 10.),
         ..Default::default()
     })
     .insert(GameOver);

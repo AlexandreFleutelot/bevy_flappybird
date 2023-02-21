@@ -35,3 +35,9 @@ pub struct Velocity {
     pub x: f32,
     pub y: f32,
 }
+
+#[derive(Component)]
+pub struct Parallax {
+    pub velocity_x: f32,
+    pub loop_x: f32,
+}
