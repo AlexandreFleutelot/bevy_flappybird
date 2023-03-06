@@ -1,5 +1,5 @@
 [package]
-name = "RUST-flappybird"
+name = "bevy_flappybird"
 version = "0.1.0"
 edition = "2021"
 
